@@ -22,6 +22,6 @@ app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')));
 // Lidar automaticamente para retornarmos erros para o front
 app.use(errors());
 
-app.listen(3333);
+app.listen(process.env.PORT || 3333);
 
 
