@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import knex from "../database/connection";
-import { IPAddress } from "../../../UserIPAddress";
 import { celebrate, Joi } from "celebrate"; // validação dos campos
 
 /* Como tiramos isso do arquivo de rotas Não temos mais a identificação do formato do request e do response 

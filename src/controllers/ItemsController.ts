@@ -2,8 +2,6 @@ import knex from '../database/connection'; // importar a conexão com o banco de
 
 import { Request, Response } from 'express';
 
-import { IPAddress } from '../../../UserIPAddress';
-
 class ItemsController {
 
     /* ~ Listar Itens ~ */
