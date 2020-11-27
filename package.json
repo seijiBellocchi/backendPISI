@@ -3,11 +3,27 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "test": "jest",
+  "jest": {
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "jsx",
+      "ts",
+      "tsx",
+      "node"
+    ]
+  },
   "scripts": {
     "dev": "ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
     "knex:seed": "knex --knexfile knexfile.ts seed:run",
     "knex:migrate": "knex --knexfile knexfile.ts migrate:latest",
-    "test": "jest"
+    "test": "jest",
+    "start": "npx ts-node ./src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,10 +31,14 @@
   "dependencies": {
     "@types/cors": "^2.8.6",
     "celebrate": "^12.1.1",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "express": "^4.17.1",
     "knex": "^0.21.1",
+    "mocha": "^8.2.1",
     "multer": "^1.4.2",
-    "sqlite3": "^4.2.0"
+    "sqlite3": "^4.2.0",
+    "ts-jest": "^26.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -28,7 +48,7 @@
     "@types/multer": "^1.4.3",
     "babel-jest": "^26.6.1",
     "cors": "^2.8.5",
-    "jest": "^26.6.1",
+    "jest": "^26.6.3",
     "ts-node": "^8.10.2",
     "ts-node-dev": "^1.0.0-pre.49",
     "typescript": "^3.9.5"

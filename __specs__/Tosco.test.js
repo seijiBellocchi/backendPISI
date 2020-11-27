@@ -1,5 +1,5 @@
 import sum from "../src/server";
 
-test('Funcionou', () => {
+test('Soma', () => {
   expect(sum(1, 2)).toBe(3);
 });
