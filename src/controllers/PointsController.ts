@@ -6,8 +6,8 @@ import { celebrate, Joi } from "celebrate"; // validação dos campos
 Parameter 'request' has any tipe: precisamos informar manualmente (importamos Request e Response e informamos que request: Request (request é do tipo request) */
 class PointsController {
   /* ~ Listar Pontos de Coleta (Filtro por Cidade/Estado/items) ~ */
-  async index(request: Request, response: Response) {
-    const { city, uf, items } = request.query;
+  async index(query:any) {
+    const { city, uf, items } = query;
 
     const parsedItems = String(items)
       .split(",")
@@ -37,23 +37,19 @@ class PointsController {
       };
     });
 
-    const aux = response.json(serializedPoints);
-
-    console.log(aux);
-
-    return response.json(serializedPoints);
+    return serializedPoints;
   }
 
   /* ~ Listar Ponto de Coleta específico ~*/
-  async show(request: Request, response: Response) {
+  async show(params:any) {
     // const id = request.params.id desestruturado vira const { id } = request.params
-    const { id } = request.params; // id do ponto de coleta especifico que vai ser exibido
+    const { id } = params; // id do ponto de coleta especifico que vai ser exibido
 
     // first: como sabemos que o id é unico, o first retornará o primeiro (único), ao inves de considerar point um array
     const point = await knex("points").where("id", id).first();
 
     if (!point) {
-      return response.status(400).json({ message: "Point not found." }); // status code que começa com 4 significa erro
+      throw { message: "Point not found.", status:400 }; // status code que começa com 4 significa erro
     }
 
     // SERIALIZAÇÃO para permitir que o mobile acesse a imagem com o caminho
@@ -76,11 +72,13 @@ class PointsController {
       .where("point_items.point_id", id)
       .select("items.title");
 
-    return response.json({ point: serializedPoint, items }); // por causa da serialização agora retornamos point como sendo serializedPoint
+    return { point: serializedPoint, items }; // por causa da serialização agora retornamos point como sendo serializedPoint
   }
 
   /* ~ Criar Pontos de Coleta ~ */
-  async create(request: Request, response: Response) {
+  async create(body:any, file:any) {
+    console.log(body);
+    //body= JSON.parse(body);
     // DESESTRUTURAÇÃO: Ao invés de fazer "const data = request.body", como sabemos o formato do body podemos colocar cada campo em uma variavel, quer dizer o mesmo que "const name = request.body.name" para cada campo
     // colocamos os items pois serão mostrados em "itens de coleta"
     const {
@@ -92,8 +90,7 @@ class PointsController {
       city,
       uf,
       items,
-    } = request.body;
-    
+    } = body;
     // items não é um campo da tabela points, será criado posteriormente
 
     // TRANSACTION: se acontecer um problema na segunda inserção, a primeira não deve executar, fazendo rollback da primeira query. Para isso substituimos knex por trx, (ou seja knex('points') vira trx('points')), mudar em ambas
@@ -104,7 +101,7 @@ class PointsController {
     // (1.) INSERÇÃO DOS PONTOS
     const point = {
       // image: request.file.filename, // pegamos o arquivo recebido no upload pelo multer
-      image: request.file.filename, // pegamos o arquivo recebido no upload pelo multer
+      //image: file.filename, // pegamos o arquivo recebido no upload pelo multer
       name,
       email,
       whatsapp,
@@ -130,6 +127,7 @@ class PointsController {
           items: Joi.string()
             .regex(/^[\s,\d+]+$/)
             .required(),
+          
           /* REGEX: validação para receber numeros entre virgulas e espaços 
             / /: expressão regular
             \d: checa números
@@ -147,8 +145,11 @@ class PointsController {
         abortEarly: false, // faz todas as validações ao mesmo tempo
       }
     );
+    console.log("fim do celebrate");
 
+    console.log(point);
     const insertedIds = await trx("points").insert(point);
+      console.log("Chegou aqui PointsController l149", insertedIds)
 
     /* RELACIONAMENTO COM A TABELA DE ITENS ------------------
             items é um array de numeros equivalente a cada item
@@ -170,18 +171,20 @@ class PointsController {
         };
       });
 
+    console.log(pointItems);
     // (2.) INSERÇÃO NA TABELA DE RELAÇÃO ENTRE POINTS E ITENS
     await trx("point_items").insert(pointItems);
+
     //-----------------------
 
     await trx.commit(); // faz de fato os inserts na base de dados
 
     // SPREAD: com os ... você pega o conteúdo de um objeto (point) e retorna dentro de outro (o do return)
     // retorna dados do ponto de coleta criado e o id
-    return response.json({
+    return {
       id: point_id,
       ...point,
-    });
+    };
   }
 }
 

@@ -3,6 +3,9 @@ import cors from 'cors';
 import routes from './routes'; //arquivo da aplicação na mesma pasta do server (./)
 import path from 'path';
 import { errors } from 'celebrate';
+import {seed} from './database/seeds/create_items'
+
+import Knex from 'knex';
 
 const app = express();
 

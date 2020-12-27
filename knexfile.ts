@@ -15,5 +15,18 @@ module.exports = {
       directory: path.resolve(__dirname, "src", "database", "seeds"),
     },
   },
+  test: {
+    client: "sqlite3",
+    connection: {
+      filename: path.resolve(__dirname, 'database.sqlite'),
+    },
+    useNullAsDefault: true,
+    migrations: {
+      directory: path.join(__dirname, "migrations")
+    },
+    seeds: {
+      directory: path.join(__dirname, "seeds")
+    }
+  },
   useNullAsDefault: true,
 };
